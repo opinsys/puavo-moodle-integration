@@ -1,6 +1,6 @@
 ## Overview
 
-Integration software for [Puavo](https://github.com/opinsys/puavo) and [Moodle](http://moodle.org)
+Integration software for [Puavo](https://github.com/opinsys/puavo-users) and [Moodle](http://moodle.org)
 
 ## Copyright
 
