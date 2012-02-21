@@ -1,7 +1,11 @@
+$LOAD_PATH << './lib'
+
 require 'sinatra/base'
 require 'sinatra/logger'
 require 'yaml'
 require 'json'
+require 'rest-client'
+require 'moodle'
 
 class PuavoMoodleIntegration < Sinatra::Base
   register(Sinatra::Logger)
@@ -11,5 +15,9 @@ class PuavoMoodleIntegration < Sinatra::Base
 
   post '/webhook' do
     logger.debug "Webhook request"
+
+    # Create user
+    moodle = Moodle.new(settings.moodle_server, settings.moodle_token)
+    puts moodle.create_user
   end
 end
