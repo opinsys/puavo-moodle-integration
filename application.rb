@@ -16,8 +16,11 @@ class PuavoMoodleIntegration < Sinatra::Base
   post '/webhook' do
     logger.debug "Webhook request"
 
+    # FIXME: Authentication
+
     # Create user
-    moodle = Moodle.new(settings.moodle_server, settings.moodle_token)
-    puts moodle.create_user
+    #moodle = Moodle.new(settings.moodle_server, settings.moodle_token)
+    #puts moodle.create_user
+    "Hello World"
   end
 end
