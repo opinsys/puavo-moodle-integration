@@ -20,8 +20,8 @@ class PuavoMoodleIntegration < Sinatra::Base
     # FIXME: Authentication
 
     # Create user
-    #moodle = Moodle.new(configuration["moodle_server"], configuration["moodle_token"])
-    #puts moodle.create_user
+    moodle = Moodle.new(configuration["moodle_server"], configuration["moodle_token"])
+    puts moodle.create_user
     
     case params.keys.first
     when "user"
