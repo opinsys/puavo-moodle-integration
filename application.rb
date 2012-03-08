@@ -19,14 +19,38 @@ class PuavoMoodleIntegration < Sinatra::Base
     logger.debug "Webhook request"
     # FIXME: Authentication
 
-    # Create user
-    moodle = Moodle.new(configuration["moodle_server"], configuration["moodle_token"])
-    puts moodle.create_user
     
     case params.keys.first
     when "user"
-      %Q{ {"message":"User was successfully created"} }
+      user = convert_puavo_user_to_moodle_user(params[:user])
+      # Create user
+      # FIXME: was user already created?
+      moodle = Moodle.new(configuration["moodle_server"], configuration["moodle_token"])
+      response = moodle.create_user(user)
+      if response.has_key?("exception")
+        logger.debug "Failed to create user: " + params[:user][:uid]
+        logger.debug "Exception: " + response["exception"]
+        logger.debug "Debuginfo: " + response["debuginfo"]
+        status 422
+        %Q{ {"message":"Failed to create user"} }
+      elsif response.has_key?("username") && response.has_key?("id")
+        %Q{ {"message":"User was successfully created"} }
+      end
     when "course"
     end
+  end
+
+  def convert_puavo_user_to_moodle_user(user)
+    moodle_user = {
+      "username" => user["uid"],
+      "firstname" => user["given_name"],
+      "lastname" => user["surname"],
+      "email" => user["email"],
+      "idnumber" => user["puavo_id"] }
+
+    # FIXME: remove useless integration data
+    moodle_user["city"] = "test"
+    moodle_user["password"] = " "
+    moodle_user
   end
 end
