@@ -22,6 +22,8 @@ class MoodleAPI < Sinatra::Base
           end
         end
         %Q( [{"username":"#{user["username"]}","id":"123456"}] )
+      when 'core_user_delete_users'
+        "{}"
       else
         raise
       end
