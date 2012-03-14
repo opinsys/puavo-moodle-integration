@@ -53,9 +53,20 @@ class Moodle
     response = JSON.parse(response)
     response = response.class == Array ? response.first : response
     if response.has_key?("username") && response.has_key?("id")
-      User.create!(:puavo_id => user[:puavo_id], :moodle_id => response["id"])
+      Course.create!(:puavo_id => user[:puavo_id], :moodle_id => response["id"])
     end
     return response
+  end
+
+  def delete_course(puavo_id, moodle_id)
+    response = @moodle.post( :wsfunction => 'core_course_delete_courses',
+                             :courseids => {
+                               "0" => moodle_id } )
+    response = JSON.parse(response)
+    response = response.class == Array ? response.first : response
+    unless response.has_key?("exception")
+      Course.find_by_puavo_id_and_moodle_id(puavo_id, moodle_id).destroy
+    end
   end
 
   private
