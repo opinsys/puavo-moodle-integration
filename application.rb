@@ -8,6 +8,7 @@ require 'json'
 require 'rest-client'
 require 'moodle'
 require 'user'
+require 'course'
 
 CONFIG = YAML.load_file("config/application.yml")[ ENV['RACK_ENV'] ]
 
@@ -32,22 +33,37 @@ class PuavoMoodleIntegration < Sinatra::Base
       sync_user = User.find_by_puavo_id(user[:puavo_id])
       moodle = Moodle.new(CONFIG["moodle_server"], CONFIG["moodle_token"])
 
-      case params[:action]
-      when "create"
-        response = moodle.create_user(user)
-      when "destroy"
-        response = moodle.delete_user(user)
-      when "save"
-        response = moodle.update_user(user)
-      end
-      if response.has_key?("exception")
-        logger.debug "Failed to create user: " + user[:uid]
+      begin
+        case params[:action]
+        when "create"
+          response = moodle.create_user(user)
+          if response.has_key?("exception")
+            raise  %Q{ {"message":"Failed to create user"} }
+          elsif response.has_key?("username") && response.has_key?("id")
+            %Q{ {"message":"User was successfully created"} }
+          end
+        when "destroy"
+          response = moodle.delete_user(user)
+          if response.has_key?("exception")
+            raise  %Q{ {"message":"Failed to delete user"} }
+          else
+            %Q{ {"message":"User was successfully deleted"} }
+          end
+        when "save"
+          response = moodle.update_user(user)
+          if response.has_key?("exception")
+            raise  %Q{ {"message":"Failed to update user"} }
+          else
+            %Q{ {"message":"User was successfully updated"} }
+          end
+        end
+      rescue Exception => e
+        logger.debug e.to_s
+        logger.debug "uid: " + user[:uid]
         logger.debug "Exception: " + response["exception"]
         logger.debug "Debuginfo: " + response["debuginfo"]
         status 422
-        %Q{ {"message":"Failed to create user"} }
-      elsif response.has_key?("username") && response.has_key?("id")
-        %Q{ {"message":"User was successfully created"} }
+        %Q{ {"message":"Failed to create, update or delete user"} }
       end
     when "course"
       course = params[:course]

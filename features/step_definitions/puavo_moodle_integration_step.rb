@@ -1,6 +1,4 @@
 Before do
-  # User.all.map &:destroy
-  CONFIG = YAML.load_file("config/application.yml")[ ENV['RACK_ENV'] ]
   moodle = Moodle.new(CONFIG["moodle_server"], CONFIG["moodle_token"])
   User.all.each do |user|
     moodle.delete_user(user.puavo_id, user.moodle_id)

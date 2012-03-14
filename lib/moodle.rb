@@ -45,6 +45,15 @@ class Moodle
     end
   end
 
+  def get_user(user)
+    sync_user = User.find_by_puavo_id(user[:puavo_id])
+    response = @moodle.post( :wsfunction => 'core_user_get_users_by_id',
+                             :userids => {
+                               "0" => sync_user.moodle_id } )
+    response = JSON.parse(response)
+    response.class == Array ? response.first : response
+  end
+
   def create_course(course)
     moodle_course = convert_puavo_course_to_moodle_course(course)
     response = @moodle.post( :wsfunction => 'core_course_create_courses',
