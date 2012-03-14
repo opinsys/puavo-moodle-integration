@@ -23,6 +23,17 @@ class Moodle
     return response
   end
 
+  def update_user(user)
+    moodle_user = convert_puavo_user_to_moodle_user(user)
+    sync_user = User.find_by_puavo_id(user[:puavo_id])
+    moodle_user["id"] = sync_user.moodle_id
+    response = @moodle.post( :wsfunction => 'core_user_update_users',
+                             :users => {
+                               "0" => moodle_user } )
+    response = JSON.parse(response)
+    response.class == Array ? response.first : response
+  end
+
   def delete_user(puavo_id, moodle_id)
     response = @moodle.post( :wsfunction => 'core_user_delete_users',
                              :userids => {

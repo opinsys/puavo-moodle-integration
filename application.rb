@@ -36,6 +36,7 @@ class PuavoMoodleIntegration < Sinatra::Base
       when "destroy"
         response = moodle.delete_user(user)
       when "save"
+        response = moodle.update_user(user)
       end
       if response.has_key?("exception")
         logger.debug "Failed to create user: " + user[:uid]
