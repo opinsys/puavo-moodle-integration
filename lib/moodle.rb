@@ -30,19 +30,29 @@ class Moodle
     response = @moodle.post( :wsfunction => 'core_user_update_users',
                              :users => {
                                "0" => moodle_user } )
-    response = JSON.parse(response)
+    if response == "null"
+      response = {}
+    else
+      response = JSON.parse(response)
+    end
     response.class == Array ? response.first : response
   end
 
-  def delete_user(puavo_id, moodle_id)
+  def delete_user(user)
+    sync_user = User.find_by_puavo_id(user[:puavo_id])
     response = @moodle.post( :wsfunction => 'core_user_delete_users',
                              :userids => {
-                               "0" => moodle_id } )
-    response = JSON.parse(response)
+                               "0" => sync_user.moodle_id } )
+    if response == "null"
+      response = {}
+    else
+      response = JSON.parse(response)
+    end
     response = response.class == Array ? response.first : response
     unless response.has_key?("exception")
-      User.find_by_puavo_id_and_moodle_id(puavo_id, moodle_id).destroy
+      User.find_by_puavo_id_and_moodle_id(sync_user.puavo_id, sync_user.moodle_id).destroy
     end
+    response
   end
 
   def get_user(user)

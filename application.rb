@@ -40,21 +40,21 @@ class PuavoMoodleIntegration < Sinatra::Base
           if response.has_key?("exception")
             raise  %Q{ {"message":"Failed to create user"} }
           elsif response.has_key?("username") && response.has_key?("id")
-            %Q{ {"message":"User was successfully created"} }
+            return %Q{ {"message":"User was successfully created"} }
           end
         when "destroy"
           response = moodle.delete_user(user)
           if response.has_key?("exception")
             raise  %Q{ {"message":"Failed to delete user"} }
           else
-            %Q{ {"message":"User was successfully deleted"} }
+            return %Q{ {"message":"User was successfully deleted"} }
           end
         when "save"
           response = moodle.update_user(user)
           if response.has_key?("exception")
             raise  %Q{ {"message":"Failed to update user"} }
           else
-            %Q{ {"message":"User was successfully updated"} }
+            return %Q{ {"message":"User was successfully updated"} }
           end
         end
       rescue Exception => e
