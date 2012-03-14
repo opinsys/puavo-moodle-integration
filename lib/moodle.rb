@@ -69,10 +69,14 @@ class Moodle
     response = @moodle.post( :wsfunction => 'core_course_create_courses',
                              :courses => {
                                "0" => moodle_course } )
-    response = JSON.parse(response)
+    if response == "null"
+      response = {}
+    else
+      response = JSON.parse(response)
+    end
     response = response.class == Array ? response.first : response
-    if response.has_key?("username") && response.has_key?("id")
-      Course.create!(:puavo_id => user[:puavo_id], :moodle_id => response["id"])
+    if response.has_key?("shortname") && response.has_key?("id")
+      Course.create!(:puavo_id => course[:puavo_id], :moodle_id => response["id"])
     end
     return response
   end
