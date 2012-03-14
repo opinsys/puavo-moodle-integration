@@ -24,6 +24,14 @@ class MoodleAPI < Sinatra::Base
         %Q( [{"username":"#{user["username"]}","id":"123456"}] )
       when 'core_user_delete_users'
         "{}"
+      when 'core_course_create_courses'
+        if params[:courses] && course = params[:courses]["0"]
+          if course["fullname"].to_s.empty? ||
+              course["shortname"].to_s.empty?
+            raise
+          end
+           %Q( [{"shortname":"#{course["shortname"]}","id":"123456"}] )
+        end
       else
         raise
       end

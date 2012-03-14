@@ -45,6 +45,19 @@ class Moodle
     end
   end
 
+  def create_course(course)
+    moodle_course = convert_puavo_course_to_moodle_course(course)
+    response = @moodle.post( :wsfunction => 'core_course_create_courses',
+                             :courses => {
+                               "0" => moodle_course } )
+    response = JSON.parse(response)
+    response = response.class == Array ? response.first : response
+    if response.has_key?("username") && response.has_key?("id")
+      User.create!(:puavo_id => user[:puavo_id], :moodle_id => response["id"])
+    end
+    return response
+  end
+
   private
 
   def convert_puavo_user_to_moodle_user(user)
@@ -61,4 +74,11 @@ class Moodle
     moodle_user
   end
 
+  def convert_puavo_course_to_moodle_course(course)
+    moodle_course = {
+      "fullname" => course["name"],
+      "shortname" => course["course_id"],
+      "categoryid" => CONFIG["course_category_id"] }
+    moodle_course
+  end
 end

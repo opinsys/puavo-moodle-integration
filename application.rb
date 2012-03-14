@@ -2,13 +2,19 @@ $LOAD_PATH << './lib'
 
 require 'sinatra/base'
 require 'sinatra/activerecord'
+require 'sinatra/logger'
 require 'yaml'
 require 'json'
 require 'rest-client'
 require 'moodle'
 require 'user'
 
+CONFIG = YAML.load_file("config/application.yml")[ ENV['RACK_ENV'] ]
+
 class PuavoMoodleIntegration < Sinatra::Base
+  register(Sinatra::Logger)
+
+  set :logger_level, :debug
 
   set YAML.load_file("config/application.yml")
 
@@ -48,6 +54,22 @@ class PuavoMoodleIntegration < Sinatra::Base
         %Q{ {"message":"User was successfully created"} }
       end
     when "course"
+      course = params[:course]
+      moodle = Moodle.new(configuration["moodle_server"], configuration["moodle_token"])
+
+      case params[:action]
+      when "create"
+        response = moodle.create_course(course)
+      end
+      if response.has_key?("exception")
+        logger.debug "Failed to create course: " + course[:puavo_id]
+        logger.debug "Exception: " + response["exception"]
+        logger.debug "Debuginfo: " + response["debuginfo"]
+        status 422
+        %Q{ {"message":"Failed to create course"} }
+      elsif response.has_key?("shortname") && response.has_key?("id")
+        %Q{ {"message":"Course was successfully created"} }
+      end
     end
   end
 end
