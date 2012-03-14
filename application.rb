@@ -16,10 +16,6 @@ class PuavoMoodleIntegration < Sinatra::Base
 
   set :logger_level, :debug
 
-  set YAML.load_file("config/application.yml")
-
-  configuration = settings.send(ENV['RACK_ENV'])
-
   post '/webhook' do
     logger.debug "Webhook request"
     # FIXME: Authentication
@@ -34,7 +30,7 @@ class PuavoMoodleIntegration < Sinatra::Base
       # Create user
       # FIXME: was user already created?
       sync_user = User.find_by_puavo_id(user[:puavo_id])
-      moodle = Moodle.new(configuration["moodle_server"], configuration["moodle_token"])
+      moodle = Moodle.new(CONFIG["moodle_server"], CONFIG["moodle_token"])
 
       case params[:action]
       when "create"
@@ -55,7 +51,7 @@ class PuavoMoodleIntegration < Sinatra::Base
       end
     when "course"
       course = params[:course]
-      moodle = Moodle.new(configuration["moodle_server"], configuration["moodle_token"])
+      moodle = Moodle.new(CONFIG["moodle_server"], CONFIG["moodle_token"])
 
       case params[:action]
       when "create"
