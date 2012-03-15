@@ -1,4 +1,4 @@
-Feature: User webhook
+Feature: Course webhook
 
   Scenario: Create new course
     When Puavo POST to "/webhook" using JSON
