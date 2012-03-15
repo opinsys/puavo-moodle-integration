@@ -81,6 +81,23 @@ class Moodle
     return response
   end
 
+  # Course update is not implemented: Moodle 2.2.2 (Build: 20120312)
+  def update_course(course)
+    moodle_course = convert_puavo_course_to_moodle_course(course)
+    sync_course = Course.find_by_puavo_id(course[:puavo_id])
+    moodle_course["id"] = sync_course.moodle_id
+    response = @moodle.post( :wsfunction => 'core_course_update_courses',
+                             :courses => {
+                               "0" => moodle_course } )
+    if response == "null"
+      response = {}
+    else
+      response = JSON.parse(response)
+    end
+    response.class == Array ? response.first : response
+  end
+
+  # Course delete is not implemented: Moodle 2.2.2 (Build: 20120312)
   def delete_course(puavo_id, moodle_id)
     response = @moodle.post( :wsfunction => 'core_course_delete_courses',
                              :courseids => {

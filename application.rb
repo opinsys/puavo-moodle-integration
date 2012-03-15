@@ -69,18 +69,25 @@ class PuavoMoodleIntegration < Sinatra::Base
       course = params[:course]
       moodle = Moodle.new(CONFIG["moodle_server"], CONFIG["moodle_token"])
 
-      case params[:action]
-      when "create"
-        response = moodle.create_course(course)
-      end
-      if response.has_key?("exception")
-        logger.debug "Failed to create course: " + course[:puavo_id]
+      begin
+        case params[:action]
+        when "create"
+          response = moodle.create_course(course)
+          if response.has_key?("shortname") && response.has_key?("id")
+            return %Q{ {"message":"Course was successfully created"} }
+          else
+            raise  %Q{ {"message":"Failed to create course"} }
+          end
+        when "update"
+          # Course update is not implemented: Moodle 2.2.2 (Build: 20120312)
+        end
+      rescue
+        logger.debug e.to_s
+        logger.debug "puavo_id: " + course[:puavo_id]
         logger.debug "Exception: " + response["exception"]
         logger.debug "Debuginfo: " + response["debuginfo"]
         status 422
-        %Q{ {"message":"Failed to create course"} }
-      elsif response.has_key?("shortname") && response.has_key?("id")
-        %Q{ {"message":"Course was successfully created"} }
+        %Q{ {"message":"Failed to create, update or delete course"} }
       end
     end
   end
