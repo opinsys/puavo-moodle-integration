@@ -15,7 +15,7 @@ Feature: User webhook
     Then I should see "User was successfully created"
     When Puavo POST to "/webhook" using JSON
     """
-    {"user":{"given_name":"JaneEDIT","surname":"DoeEDIT","uid":"jane.doe","email":"jane.doe@example.net","puavo_id":"654321"},"action":"save"}
+    {"user":{"given_name":"JaneEDIT","surname":"DoeEDIT","uid":"jane.doe","email":"jane.doe@example.net","puavo_id":"654321"},"action":"update"}
     """
     Then I should see "User was successfully updated"
 
