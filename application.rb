@@ -24,6 +24,7 @@ class PuavoMoodleIntegration < Sinatra::Base
     # Authentication
     unless HMAC::SHA1.hexdigest( CONFIG["private_api_key"],
                                  params[:payload] ) == params[:hmac]
+      logger.debug "Authentication failed"
       status 422
       return %Q{ {"message":"Authentication failed"} }
     end
