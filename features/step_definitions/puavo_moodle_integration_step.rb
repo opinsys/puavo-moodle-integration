@@ -1,4 +1,5 @@
 Before do
+  CONFIG = ORGANISATIONS_CONFIGURATION["example"]
   moodle = Moodle.new(CONFIG["moodle_server"], CONFIG["moodle_token"])
   User.all.each do |user|
     moodle.delete_user({ "puavo_id" => user.puavo_id })

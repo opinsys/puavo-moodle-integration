@@ -11,7 +11,7 @@ require 'user'
 require 'course'
 require 'hmac-sha1'
 
-CONFIG = YAML.load_file("config/application.yml")[ ENV['RACK_ENV'] ]
+ORGANISATIONS_CONFIGURATION = YAML.load_file("config/application.yml")
 
 class PuavoMoodleIntegration < Sinatra::Base
   register(Sinatra::Logger)
@@ -20,6 +20,18 @@ class PuavoMoodleIntegration < Sinatra::Base
 
   post '/webhook' do
     logger.debug "Webhook request"
+    
+    payload = JSON.parse params[:payload]
+
+    unless payload.has_key?('organisation') &&
+        payload.has_key?('action') &&
+        ( payload.has_key?('user') ||
+          payload.has_key?('course') )
+      status 422
+      return %Q{ {"message":"Invalid parameters"} }
+    end
+
+    CONFIG = ORGANISATIONS_CONFIGURATION[ payload["organisation"] ]
 
     # Authentication
     unless HMAC::SHA1.hexdigest( CONFIG["private_api_key"],
@@ -28,8 +40,6 @@ class PuavoMoodleIntegration < Sinatra::Base
       status 422
       return %Q{ {"message":"Authentication failed"} }
     end
-
-    payload = JSON.parse params[:payload]
 
     # Detect object type
     type = "user" if payload.has_key?("user")
