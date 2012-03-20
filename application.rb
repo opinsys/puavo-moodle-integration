@@ -21,20 +21,22 @@ class PuavoMoodleIntegration < Sinatra::Base
     logger.debug "Webhook request"
     # FIXME: Authentication
 
+    payload = JSON.parse params[:payload]
+
     # Detect object type
-    type = "user" if params.has_key?("user")
-    type = "course" if params.has_key?("course")
+    type = "user" if payload.has_key?("user")
+    type = "course" if payload.has_key?("course")
 
     case type
     when "user"
-      user = params[:user]
+      user = payload["user"]
       # Create user
       # FIXME: was user already created?
-      sync_user = User.find_by_puavo_id(user[:puavo_id])
+      sync_user = User.find_by_puavo_id(user["puavo_id"])
       moodle = Moodle.new(CONFIG["moodle_server"], CONFIG["moodle_token"])
 
       begin
-        case params[:action]
+        case payload["action"]
         when "create"
           response = moodle.create_user(user)
           if response.has_key?("exception")
@@ -59,18 +61,19 @@ class PuavoMoodleIntegration < Sinatra::Base
         end
       rescue Exception => e
         logger.debug e.to_s
-        logger.debug "uid: " + user[:uid]
+        logger.debug user.inspect
+        logger.debug "uid: " + user["uid"]
         logger.debug "Exception: " + response["exception"]
         logger.debug "Debuginfo: " + response["debuginfo"]
         status 422
         %Q{ {"message":"Failed to create, update or delete user"} }
       end
     when "course"
-      course = params[:course]
+      course = payload["course"]
       moodle = Moodle.new(CONFIG["moodle_server"], CONFIG["moodle_token"])
 
       begin
-        case params[:action]
+        case payload["action"]
         when "create"
           response = moodle.create_course(course)
           if response.has_key?("shortname") && response.has_key?("id")
@@ -83,7 +86,7 @@ class PuavoMoodleIntegration < Sinatra::Base
         end
       rescue
         logger.debug e.to_s
-        logger.debug "puavo_id: " + course[:puavo_id]
+        logger.debug "puavo_id: " + course["puavo_id"]
         logger.debug "Exception: " + response["exception"]
         logger.debug "Debuginfo: " + response["debuginfo"]
         status 422
