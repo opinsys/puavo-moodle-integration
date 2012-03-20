@@ -51,7 +51,7 @@ class PuavoMoodleIntegration < Sinatra::Base
           else
             return %Q{ {"message":"User was successfully deleted"} }
           end
-        when "save"
+        when "update"
           response = moodle.update_user(user)
           if response.has_key?("exception")
             raise  %Q{ {"message":"Failed to update user"} }
