@@ -1,7 +1,7 @@
 Before do
   moodle = Moodle.new(CONFIG["moodle_server"], CONFIG["moodle_token"])
   User.all.each do |user|
-    moodle.delete_user({ :puavo_id => user.puavo_id })
+    moodle.delete_user({ "puavo_id" => user.puavo_id })
   end
   Course.all.each do |course|
     course.destroy

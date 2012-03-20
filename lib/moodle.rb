@@ -18,14 +18,14 @@ class Moodle
     response = JSON.parse(response)
     response = response.class == Array ? response.first : response
     if response.has_key?("username") && response.has_key?("id")
-      User.create!(:puavo_id => user[:puavo_id], :moodle_id => response["id"])
+      User.create!(:puavo_id => user["puavo_id"], :moodle_id => response["id"])
     end
     return response
   end
 
   def update_user(user)
     moodle_user = convert_puavo_user_to_moodle_user(user)
-    sync_user = User.find_by_puavo_id(user[:puavo_id])
+    sync_user = User.find_by_puavo_id(user["puavo_id"])
     moodle_user["id"] = sync_user.moodle_id
     response = @moodle.post( :wsfunction => 'core_user_update_users',
                              :users => {
@@ -39,7 +39,7 @@ class Moodle
   end
 
   def delete_user(user)
-    sync_user = User.find_by_puavo_id(user[:puavo_id])
+    sync_user = User.find_by_puavo_id(user["puavo_id"])
     response = @moodle.post( :wsfunction => 'core_user_delete_users',
                              :userids => {
                                "0" => sync_user.moodle_id } )
@@ -56,7 +56,7 @@ class Moodle
   end
 
   def get_user(user)
-    sync_user = User.find_by_puavo_id(user[:puavo_id])
+    sync_user = User.find_by_puavo_id(user["puavo_id"])
     response = @moodle.post( :wsfunction => 'core_user_get_users_by_id',
                              :userids => {
                                "0" => sync_user.moodle_id } )
@@ -76,7 +76,7 @@ class Moodle
     end
     response = response.class == Array ? response.first : response
     if response.has_key?("shortname") && response.has_key?("id")
-      Course.create!(:puavo_id => course[:puavo_id], :moodle_id => response["id"])
+      Course.create!(:puavo_id => course["puavo_id"], :moodle_id => response["id"])
     end
     return response
   end
@@ -84,7 +84,7 @@ class Moodle
   # Course update is not implemented: Moodle 2.2.2 (Build: 20120312)
   def update_course(course)
     moodle_course = convert_puavo_course_to_moodle_course(course)
-    sync_course = Course.find_by_puavo_id(course[:puavo_id])
+    sync_course = Course.find_by_puavo_id(course["puavo_id"])
     moodle_course["id"] = sync_course.moodle_id
     response = @moodle.post( :wsfunction => 'core_course_update_courses',
                              :courses => {
