@@ -9,6 +9,7 @@ require 'rest-client'
 require 'moodle'
 require 'user'
 require 'course'
+require 'hmac-sha1'
 
 CONFIG = YAML.load_file("config/application.yml")[ ENV['RACK_ENV'] ]
 
@@ -19,7 +20,13 @@ class PuavoMoodleIntegration < Sinatra::Base
 
   post '/webhook' do
     logger.debug "Webhook request"
-    # FIXME: Authentication
+
+    # Authentication
+    unless HMAC::SHA1.hexdigest( CONFIG["private_api_key"],
+                                 params[:payload] ) == params[:hmac]
+      status 422
+      return %Q{ {"message":"Authentication failed"} }
+    end
 
     payload = JSON.parse params[:payload]
 

@@ -11,5 +11,14 @@ end
 
 When /^Puavo POST to "(.+)" using JSON$/ do |path, *body|
   visit "/"
-  page.driver.post(path, :payload => body.first)
+  page.driver.post(path,
+                   :payload => body.first,
+                   :hmac => HMAC::SHA1.hexdigest(CONFIG["private_api_key"], body.first) )
+end
+When /^Puavo POST to "([^\"]*)" using JSON with wrong private api key$/ do |path, *body|
+  visit "/"
+  page.driver.post(path,
+                   :payload => body.first,
+                   :hmac => HMAC::SHA1.hexdigest(CONFIG["private_api_key"] + "BROKEN",
+                                                 body.first) )
 end
