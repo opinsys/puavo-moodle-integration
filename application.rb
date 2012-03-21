@@ -41,6 +41,8 @@ class PuavoMoodleIntegration < Sinatra::Base
       return %Q{ {"message":"Authentication failed"} }
     end
 
+    Thread.current["organisation"] = payload["organisation"]
+
     # Detect object type
     type = "user" if payload.has_key?("user")
     type = "course" if payload.has_key?("course")

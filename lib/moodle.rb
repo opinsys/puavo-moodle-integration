@@ -126,10 +126,11 @@ class Moodle
   end
 
   def convert_puavo_course_to_moodle_course(course)
+    
     moodle_course = {
       "fullname" => course["name"],
       "shortname" => course["course_id"],
-      "categoryid" => CONFIG["course_category_id"] }
+      "categoryid" =>  ORGANISATIONS_CONFIGURATION[Thread.current["organisation"]]["course_category_id"] }
     moodle_course
   end
 end
