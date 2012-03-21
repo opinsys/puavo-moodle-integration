@@ -1,4 +1,5 @@
 Before do
+  Thread.current["organisation"] = "example"
   CONFIG = ORGANISATIONS_CONFIGURATION["example"]
   moodle = Moodle.new(CONFIG["moodle_server"], CONFIG["moodle_token"])
   User.all.each do |user|
