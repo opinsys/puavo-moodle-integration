@@ -102,7 +102,7 @@ class PuavoMoodleIntegration < Sinatra::Base
         when "update"
           # Course update is not implemented: Moodle 2.2.2 (Build: 20120312)
         end
-      rescue
+      rescue Exception => e
         logger.debug e.to_s
         logger.debug "puavo_id: " + course["puavo_id"]
         logger.debug "Exception: " + response["exception"]
