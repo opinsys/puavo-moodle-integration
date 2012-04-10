@@ -45,6 +45,14 @@ class MoodleAPI < Sinatra::Base
           end
            %Q( [{"shortname":"#{course["shortname"]}","id":"123456"}] )
         end
+      when 'core_group_create_groups'
+        if params[:groups] && group = params[:groups]["0"]
+          if group["name"].to_s.empty? ||
+              group["courseid"].to_s.empty?
+            raise
+          end
+          %Q( [{"name":"#{group["name"]}","id":"112233","courseid":"123456"}] )
+        end
       else
         raise
       end

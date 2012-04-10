@@ -97,6 +97,11 @@ class PuavoMoodleIntegration < Sinatra::Base
         when "create"
           response = moodle.create_course(course)
           if response.has_key?("shortname") && response.has_key?("id")
+            response = moodle.create_course_group( "name" => response["shortname"],
+                                                   "courseid" => response["id"] )
+            unless response.has_key?("id") && response.has_key?("courseid")
+              raise %Q{ {"message":"Failed to create course group"} }
+            end
             return %Q{ {"message":"Course was successfully created"} }
           else
             raise  %Q{ {"message":"Failed to create course"} }
@@ -106,9 +111,9 @@ class PuavoMoodleIntegration < Sinatra::Base
         end
       rescue Exception => e
         logger.debug e.to_s
-        logger.debug "puavo_id: " + course["puavo_id"]
-        logger.debug "Exception: " + response["exception"]
-        logger.debug "Debuginfo: " + response["debuginfo"]
+        logger.debug "puavo_id: " + course["puavo_id"].to_s
+        logger.debug "Exception: " + response["exception"].to_s
+        logger.debug "Debuginfo: " + response["debuginfo"].to_s
         status 422
         %Q{ {"message":"Failed to create, update or delete course"} }
       end

@@ -109,6 +109,22 @@ class Moodle
     end
   end
 
+  def create_course_group(group)
+    response = @moodle.post( :wsfunction => 'core_group_create_groups',
+                             :groups => {
+                               "0" => group } )
+    if response == "null"
+      response = {}
+    else
+      response = JSON.parse(response)
+    end
+    response = response.class == Array ? response.first : response
+    if response.has_key?("id") && response.has_key?("courseid")
+      # FIXME
+    end
+    return response
+  end
+
   private
 
   def convert_puavo_user_to_moodle_user(user)
