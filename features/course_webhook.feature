@@ -6,6 +6,7 @@ Feature: Course webhook
     {"course":{"name":"Mathematics","course_id":"MA9001","description":"Algebra","puavo_id":"223344"},"action":"create","organisation":"example"}
     """
     Then I should see "Course was successfully created"
+    And I should find course's group "MA9001" by puavo id "223344"
 
 #  Course update is not implemented: Moodle 2.2.2 (Build: 20120312)
 #

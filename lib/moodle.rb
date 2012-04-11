@@ -120,9 +120,22 @@ class Moodle
     end
     response = response.class == Array ? response.first : response
     if response.has_key?("id") && response.has_key?("courseid")
-      # FIXME
+      course = Course.find_by_moodle_id( group["courseid"] )
+      course.moodle_group_id = response["id"]
+      course.save!
     end
     return response
+  end
+
+  def get_group_by_course_id(course_id)
+    response = @moodle.post( :wsfunction => 'core_group_get_course_groups',
+                             :courseid => course_id )
+    if response == "null"
+      response = {}
+    else
+      response = JSON.parse(response)
+    end
+    return response.class == Array ? response.first : response
   end
 
   private

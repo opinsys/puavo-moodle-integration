@@ -9,6 +9,8 @@ class MoodleAPI < Sinatra::Base
   end
 
   post '/webservice/rest/server.php' do
+    Thread.current["organisation"] = "example"
+
     begin
       case params[:wsfunction]
       when 'core_user_create_users'
@@ -43,7 +45,8 @@ class MoodleAPI < Sinatra::Base
               course["shortname"].to_s.empty?
             raise
           end
-           %Q( [{"shortname":"#{course["shortname"]}","id":"123456"}] )
+          course = MoodleCourse.create(course)
+          %Q( [{"shortname":"#{course["shortname"]}","id":"#{course["id"]}"}] )
         end
       when 'core_group_create_groups'
         if params[:groups] && group = params[:groups]["0"]
@@ -52,6 +55,14 @@ class MoodleAPI < Sinatra::Base
             raise
           end
           %Q( [{"name":"#{group["name"]}","id":"112233","courseid":"123456"}] )
+        end
+      when 'core_group_get_course_groups'
+        if course_id = params[:courseid]
+          if course_id.to_i == 0
+            raise
+          end
+          course = MoodleCourse.find(params[:courseid])
+          %Q( [{"id":"889977","name":"#{course['shortname']}","courseid":"#{params[:courseid]}"}] )
         end
       else
         raise
@@ -64,5 +75,20 @@ class MoodleAPI < Sinatra::Base
 
   Thread.new do
     run!
+  end
+end
+
+class MoodleCourse
+  @@courses_by_shortname = {}
+  @@course_id = 123456
+
+  def self.create(course)
+    @@course_id += 1
+    course["id"] = @@course_id.to_s
+    @@courses_by_shortname[ @@course_id.to_s ] = course
+  end
+  
+  def self.find(id)
+    @@courses_by_shortname[ id ]
   end
 end
