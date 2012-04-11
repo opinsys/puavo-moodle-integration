@@ -98,7 +98,9 @@ class PuavoMoodleIntegration < Sinatra::Base
           response = moodle.create_course(course)
           if response.has_key?("shortname") && response.has_key?("id")
             response = moodle.create_course_group( "name" => response["shortname"],
-                                                   "courseid" => response["id"] )
+                                                   "courseid" => response["id"],
+                                                   "description" => "",
+                                                   "enrolmentkey" => "" )
             unless response.has_key?("id") && response.has_key?("courseid")
               raise %Q{ {"message":"Failed to create course group"} }
             end
